@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Venomous Readiness</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08090c;color:#f5f5f5;font-family:Arial,sans-serif}
+header{padding:22px 16px;border-bottom:1px solid #292b32;display:flex;align-items:center;gap:12px}
+.logo{width:45px;height:45px;border:1px solid #777;border-radius:50%;display:grid;place-items:center;font-weight:bold}
+h1{font-size:19px;margin:0}
+header p{margin:5px 0 0;color:#92949e;font-size:12px}
+main{max-width:760px;margin:auto;padding:20px 15px}
+.panel{background:#111319;border:1px solid #292b32;border-radius:14px;padding:18px;margin-bottom:15px}
+h2{font-size:16px;margin:0 0 14px}
+button{background:#f1f1f1;color:#111;border:0;border-radius:9px;padding:12px 16px;font-weight:bold;cursor:pointer}
+input{background:#090a0e;color:white;border:1px solid #383b44;border-radius:8px;padding:12px;min-width:0;flex:1}
+.flex{display:flex;gap:8px}
+.muted{color:#9699a5;font-size:13px}
+.member{padding:12px 0;border-bottom:1px solid #292b32;display:flex;justify-content:space-between}
+.dot{color:#62e69b}
+#messages{height:210px;overflow:auto;margin-bottom:12px}
+.msg{padding:8px 0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">VR</div>
+<div><h1>VENOMOUS READINESS</h1><p>CLAN COMMUNITY</p></div>
+</header>
+<main>
+<section class="panel">
+<h2>Добро пожаловать в клан</h2>
+<p class="muted">Объединяем сильнейших. Добро пожаловать в Venomous Readiness.</p>
+<button onclick="joinClan()">Вступить в клан</button>
+<p id="status" class="muted">Ты ещё не вступил в клан.</p>
+</section>
+<section class="panel">
+<h2>Участники <span id="count">0</span></h2>
+<div id="members"><p class="muted">Пока нет участников.</p></div>
+</section>
+<section class="panel">
+<h2>Общий чат</h2>
+<div id="messages"><p class="muted">Напиши первое сообщение!</p></div>
+<div class="flex">
+<input id="message" placeholder="Твоё сообщение..." maxlength="300">
+<button onclick="sendMessage()">Отправить</button>
+</div>
+<p class="muted">Демо-чат: сообщения пока сохраняются только в этом браузере.</p>
+</section>
+<section class="panel">
+<h2>Команда</h2>
+<div class="member">Разработчик <span>OWNER</span></div>
+<p class="muted">Панель управления и реальные общие данные подключим отдельно.</p>
+</section>
+</main>
+<script>
+let members=JSON.parse(localStorage.getItem('vr_members')||'[]');
+let messages=JSON.parse(localStorage.getItem('vr_messages')||'[]');
+function renderMembers(){
+document.getElementById('count').textContent=members.length;
+document.getElementById('members').innerHTML=members.length?members.map(m=>'<div class="member"><span><span class="dot">●</span> '+escapeHtml(m)+'</span><span>Участник</span></div>').join(''):'<p class="muted">Пока нет участников.</p>';
+}
+function renderMessages(){
+document.getElementById('messages').innerHTML=messages.map(m=>'<div class="msg"><b>'+escapeHtml(m.name)+':</b> '+escapeHtml(m.text)+'</div>').join('');
+document.getElementById('messages').scrollTop=999999;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function joinClan(){
+let name=prompt('Введи свой ник:');
+if(!name||!name.trim())return;
+name=name.trim().slice(0,24);
+if(!members.includes(name)){members.push(name);localStorage.setItem('vr_members',JSON.stringify(members));}
+localStorage.setItem('vr_me',name);
+document.getElementById('status').textContent='Ты вступил в клан как '+name+'.';
+renderMembers();
+}
+function sendMessage(){
+let input=document.getElementById('message');
+let text=input.value.trim();if(!text)return;
+messages.push({name:localStorage.getItem('vr_me')||'Гость',text});
+localStorage.setItem('vr_messages',JSON.stringify(messages));
+input.value='';renderMessages();
+}
+renderMembers();renderMessages();
+</script>
+</body>
+</html>
